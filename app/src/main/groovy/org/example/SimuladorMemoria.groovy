@@ -10,7 +10,7 @@ class SimuladorMemoria {
     static void main(String[] args) {
 
         // Cola concurrente de procesos
-        def procesos = new ConcurrentLinkedDeque<Proceso>([
+        ConcurrentLinkedDeque<Proceso> procesos = new ConcurrentLinkedDeque<Proceso>([
                 new Proceso("Proceso1", 10, 50),
                 new Proceso("Proceso2", 20, 30),
                 new Proceso("Proceso3", 20, 30),
@@ -19,7 +19,7 @@ class SimuladorMemoria {
         ])
 
         // Lista de compartimientos de memoria
-        def compartimientos = [
+        ArrayList<ParticionMemoria> compartimientos = [
                 new ParticionMemoria("Compartimiento1", 60),
                 new ParticionMemoria("Compartimiento2", 40),
                 new ParticionMemoria("Compartimiento3", 30)
@@ -30,7 +30,7 @@ class SimuladorMemoria {
 
         // Ciclo para asignar procesos a compartimientos de memoria disponibles
         while (!procesos.isEmpty()) {
-            def proceso = procesos.poll() // Obtener el siguiente proceso de la cola
+            Proceso proceso = procesos.poll() // Obtener el siguiente proceso de la cola
             println(proceso)
             if (proceso != null) {
                 synchronized (compartimientos) {
