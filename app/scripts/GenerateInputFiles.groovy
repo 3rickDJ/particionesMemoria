@@ -1,5 +1,5 @@
 // Definir el directorio donde se crearán los archivos
-def inputDir = new File("${project.buildDir}/inputFiles")
+def inputDir = new File("${project.projectDir}/src/main/resources/")
 
 // Crear el directorio si no existe
 if (!inputDir.exists()) {
