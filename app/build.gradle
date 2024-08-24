@@ -48,3 +48,24 @@ tasks.named('test') {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
 }
+
+task generateInputFiles {
+    doLast {
+        // Ejecutar el script de Groovy externo para generar el archivo de entrada
+        def scriptFile = file("scripts/GenerateInputFiles.groovy")
+        if (scriptFile.exists()) {
+            // Ejecutar el script usando el motor de scripts de Groovy
+            groovyScript(scriptFile)
+        } else {
+            throw new FileNotFoundException("No se encontró el script de generación de archivos: ${scriptFile.path}")
+        }
+    }
+}
+
+// Definir un método para ejecutar scripts de Groovy
+void groovyScript(File scriptFile) {
+    def groovyShell = new GroovyShell()
+    groovyShell.setVariable('project', project) // Pasar la referencia del proyecto a GroovyShell
+    groovyShell.evaluate(scriptFile)
+}
+
