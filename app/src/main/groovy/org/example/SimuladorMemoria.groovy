@@ -3,17 +3,19 @@ package org.example
 
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.ConcurrentLinkedDeque
 
 
 class SimuladorMemoria {
     static void main(String[] args) {
+
         // Cola concurrente de procesos
-        def procesos = new ConcurrentLinkedQueue<Proceso>([
-                new Proceso("Proceso1", 5, 50),
-                new Proceso("Proceso2", 5, 30),
-                new Proceso("Proceso3", 5, 30),
-                new Proceso("Proceso4", 1, 20)
+        def procesos = new ConcurrentLinkedDeque<Proceso>([
+                new Proceso("Proceso1", 10, 50),
+                new Proceso("Proceso2", 20, 30),
+                new Proceso("Proceso3", 20, 30),
+                new Proceso("Proceso4", 20, 20),
+                new Proceso("Proceso5", 10, 60)
         ])
 
         // Lista de compartimientos de memoria
@@ -29,6 +31,7 @@ class SimuladorMemoria {
         // Ciclo para asignar procesos a compartimientos de memoria disponibles
         while (!procesos.isEmpty()) {
             def proceso = procesos.poll() // Obtener el siguiente proceso de la cola
+            println(proceso)
             if (proceso != null) {
                 synchronized (compartimientos) {
                     // Encontrar una partición de memoria libre que pueda acomodar el proceso
@@ -37,7 +40,7 @@ class SimuladorMemoria {
                         particion.libre = false // Marcar la partición como ocupada
                         pool.submit { ejecutarProceso(proceso, particion) } // Ejecutar el proceso en el pool
                     } else {
-                        procesos.add(proceso) // Reagregar el proceso a la cola si no hay particiones disponibles
+                        procesos.addFirst(proceso) // Reagregar el proceso a la cola si no hay particiones disponibles
                     }
                 }
             }
@@ -50,7 +53,7 @@ class SimuladorMemoria {
     }
 
     static void ejecutarProceso(Proceso proceso, ParticionMemoria particion) {
-        println "Iniciando ${proceso.nombre} en ${particion.nombre}"
+        println "\tIniciando ${proceso.nombre} en ${particion.nombre}"
         try {
             TimeUnit.SECONDS.sleep(proceso.tiempoEjecucion) // Simular el tiempo de ejecución del proceso
         } catch (InterruptedException e) {
@@ -58,7 +61,7 @@ class SimuladorMemoria {
         } finally {
             synchronized (particion) {
                 particion.libre = true // Liberar la partición de memoria
-                println "${proceso.nombre} ha terminado. ${particion.nombre} ahora está libre."
+                println "\t\t${proceso.nombre} ha terminado. ${particion.nombre} ahora está libre."
             }
         }
     }
