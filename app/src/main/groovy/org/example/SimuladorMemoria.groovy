@@ -9,20 +9,21 @@ import java.util.concurrent.ConcurrentLinkedDeque
 class SimuladorMemoria {
     static void main(String[] args) {
 
+        def lista = SimuladorMemoria.class.getResource('/listaProcesos.csv').text.split('\n').collect({ line ->
+            def fields = line.split(',')
+            new Proceso(fields[0], fields[1] as int, fields[2] as int)
+        })
+        println lista
+
         // Cola concurrente de procesos
-        ConcurrentLinkedDeque<Proceso> procesos = new ConcurrentLinkedDeque<Proceso>([
-                new Proceso("Proceso1", 10, 50),
-                new Proceso("Proceso2", 20, 30),
-                new Proceso("Proceso3", 20, 30),
-                new Proceso("Proceso4", 20, 20),
-                new Proceso("Proceso5", 10, 60)
-        ])
+        ConcurrentLinkedDeque<Proceso> procesos = new ConcurrentLinkedDeque<Proceso>(lista)
+
 
         // Lista de compartimientos de memoria
         ArrayList<ParticionMemoria> compartimientos = [
-                new ParticionMemoria("Compartimiento1", 60),
-                new ParticionMemoria("Compartimiento2", 40),
-                new ParticionMemoria("Compartimiento3", 30)
+                new ParticionMemoria("Compartimiento1", 100),
+                new ParticionMemoria("Compartimiento2", 500),
+                new ParticionMemoria("Compartimiento3", 1000)
         ]
 
         // Crear un pool de hilos basado en el número de compartimientos
