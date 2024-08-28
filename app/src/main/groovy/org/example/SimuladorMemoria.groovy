@@ -10,20 +10,23 @@ class SimuladorMemoria {
             def fields = line.split(',')
             new Proceso(fields[0], fields[1] as int, fields[2] as int)
         })
-        println lista
 
         // Lista de procesos
         ArrayList<Proceso> procesos = new ArrayList<Proceso>(lista)
 
         // Lista de compartimientos de memoria
         ArrayList<ParticionMemoria> compartimientos = [
-                new ParticionMemoria("Compartimiento1", 100),
-                new ParticionMemoria("Compartimiento2", 500),
-                new ParticionMemoria("Compartimiento3", 1000)
+                new ParticionMemoria("Compartimiento1", 200),
+                new ParticionMemoria("Compartimiento2", 300),
+                new ParticionMemoria("Compartimiento3", 900),
+                new ParticionMemoria("Compartimiento4", 1000),
+                new ParticionMemoria("Compartimiento5", 1200),
         ]
 
         // Crear un pool de hilos basado en el número de compartimientos
         def pool = Executors.newFixedThreadPool(compartimientos.size())
+
+        def start_time = new Date().getTime()
 
         // Ciclo para asignar procesos a compartimientos de memoria disponibles
         while (!procesos.isEmpty()) {
@@ -34,7 +37,6 @@ class SimuladorMemoria {
                 }
             }
             if (proceso != null) {
-                println procesos
                 synchronized (compartimientos) {
                     // Encontrar una partición de memoria libre que pueda acomodar el proceso
                     def particion = compartimientos.find { it.libre && it.tamaño >= proceso.tamaño }
@@ -43,13 +45,16 @@ class SimuladorMemoria {
                         pool.submit { ejecutarProceso(proceso, particion) } // Ejecutar el proceso en el pool
                     } else {
                         synchronized (procesos) {
-                            procesos.add(1,proceso) // Reagregar el proceso a la lista si no hay particiones disponibles
+                            procesos.add(procesos.size(),proceso) // Reagregar el proceso a la lista si no hay particiones disponibles
                         }
                     }
                 }
             }
-            TimeUnit.MILLISECONDS.sleep(100) // Esperar antes de intentar nuevamente
         }
+        def end_time = new Date().getTime()
+        def total_time = end_time - start_time
+
+        println "Tiempo total de ejecución: ${total_time/1000} s"
 
         // Cerrar el pool de hilos una vez que todas las tareas han sido asignadas
         pool.shutdown()

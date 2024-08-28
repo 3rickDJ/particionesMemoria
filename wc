@@ -1,0 +1,5 @@
+                new ParticionMemoria("Compartimiento1", 200),
+                new ParticionMemoria("Compartimiento2", 300),
+                new ParticionMemoria("Compartimiento3", 900),
+                new ParticionMemoria("Compartimiento4", 1000),
+                new ParticionMemoria("Compartimiento5", 1200),
