@@ -6,9 +6,9 @@ if (!inputDir.exists()) {
     inputDir.mkdirs()
 }
 
-def seconds = 1..20
+def seconds = 1..60
 def kb_size = 2..1000
-def lista = (1..300).collect {
+def lista = (1..900).collect {
     def s = seconds.shuffled().first()
     def k = kb_size.shuffled().first()
     "${it},${s},${k}"

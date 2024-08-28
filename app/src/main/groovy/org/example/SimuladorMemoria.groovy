@@ -1,10 +1,7 @@
 package org.example
-// SimuladorMemoria.groovy
 
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.ConcurrentLinkedDeque
-
 
 class SimuladorMemoria {
     static void main(String[] args) {
@@ -15,9 +12,8 @@ class SimuladorMemoria {
         })
         println lista
 
-        // Cola concurrente de procesos
-        ConcurrentLinkedDeque<Proceso> procesos = new ConcurrentLinkedDeque<Proceso>(lista)
-
+        // Lista de procesos
+        ArrayList<Proceso> procesos = new ArrayList<Proceso>(lista)
 
         // Lista de compartimientos de memoria
         ArrayList<ParticionMemoria> compartimientos = [
@@ -31,9 +27,14 @@ class SimuladorMemoria {
 
         // Ciclo para asignar procesos a compartimientos de memoria disponibles
         while (!procesos.isEmpty()) {
-            Proceso proceso = procesos.poll() // Obtener el siguiente proceso de la cola
-            println(proceso)
+            Proceso proceso
+            synchronized (procesos) {
+                if (!procesos.isEmpty()) {
+                    proceso = procesos.remove(0) // Obtener y eliminar el primer proceso de la lista
+                }
+            }
             if (proceso != null) {
+                println procesos
                 synchronized (compartimientos) {
                     // Encontrar una partición de memoria libre que pueda acomodar el proceso
                     def particion = compartimientos.find { it.libre && it.tamaño >= proceso.tamaño }
@@ -41,7 +42,9 @@ class SimuladorMemoria {
                         particion.libre = false // Marcar la partición como ocupada
                         pool.submit { ejecutarProceso(proceso, particion) } // Ejecutar el proceso en el pool
                     } else {
-                        procesos.addFirst(proceso) // Reagregar el proceso a la cola si no hay particiones disponibles
+                        synchronized (procesos) {
+                            procesos.add(1,proceso) // Reagregar el proceso a la lista si no hay particiones disponibles
+                        }
                     }
                 }
             }
